@@ -10,7 +10,9 @@
 
 > 本项目由 舰长 @tdiant 委托本人开发。
 
-### 开发示例
+### [开发示例](src/test/java/DemoPlugin.java)
+
+您可以点击这里访问项目的 [JavaDoc](https://carmjos.github.io/EasyListener) 。
 
 ```java
 
@@ -69,7 +71,7 @@ public class DemoPlugin extends JavaPlugin {
 
         <repository>
             <!--采用github依赖库，实时更新，但需要配置 (推荐) -->
-            <id>EasyConfiguration</id>
+            <id>EasyListener</id>
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/CarmJos/EasyListener</url>
         </repository>
