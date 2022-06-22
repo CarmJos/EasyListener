@@ -28,7 +28,7 @@ jobs:
       - name: "Package"
         run: mvn -B package --file pom.xml -Dgpg.skip
       - name: "Target Stage"
-        run: mkdir staging && cp */target/*.jar staging
+        run: mkdir staging && cp target/*.jar staging
       - name: "Upload artifact"
         uses: actions/upload-artifact@v2
         with:

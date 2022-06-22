@@ -11,7 +11,6 @@ public class DemoPlugin extends JavaPlugin {
 
     protected final EasyListener listeners = new EasyListener(this);
 
-
     @Override
     public void onEnable() {
 
