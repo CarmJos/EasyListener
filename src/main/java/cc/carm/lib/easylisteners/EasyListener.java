@@ -26,6 +26,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * 轻松(做)监听，简单快捷的通用Bukkit插件监听器类库。
+ *
+ * @author CarmJos
+ * @since 1.0.0
+ */
 public class EasyListener implements Listener {
 
     protected final Plugin plugin;
@@ -34,7 +40,13 @@ public class EasyListener implements Listener {
         this.plugin = plugin;
     }
 
-    private HandlerList getEventListeners(Class<? extends Event> eventClass) {
+    /**
+     * 通过 {@link SimplePluginManager} 获取到一个事件类的 {@link HandlerList} 。
+     *
+     * @param eventClass 事件类
+     * @return 事件类的 {@link HandlerList}
+     */
+    private @NotNull HandlerList getEventListeners(@NotNull Class<? extends Event> eventClass) {
         try {
             Method method = SimplePluginManager.class.getDeclaredMethod("getEventListeners", Class.class);
             method.setAccessible(true);
@@ -44,6 +56,14 @@ public class EasyListener implements Listener {
         }
     }
 
+    /**
+     * 创建一个事件的执行器实例。
+     *
+     * @param eventClass    事件类
+     * @param eventConsumer 事件执行内容
+     * @param <T>           事件类型
+     * @return 事件的执行器实例
+     */
     private <T extends Event> EventExecutor createExecutor(@NotNull Class<T> eventClass,
                                                            @NotNull Consumer<T> eventConsumer) {
         return (listener, event) -> {
@@ -56,48 +76,112 @@ public class EasyListener implements Listener {
         };
     }
 
-    protected void register(Class<? extends Event> eventClass, RegisteredListener listener) {
+    protected void register(@NotNull Class<? extends Event> eventClass, @NotNull RegisteredListener listener) {
         getEventListeners(eventClass).register(listener);
     }
 
+    protected void register(@NotNull Class<? extends Event> eventClass, @NotNull EventExecutor executor,
+                            @NotNull EventPriority priority, boolean ignoreCancelled) {
+        register(eventClass, new RegisteredListener(this, executor, priority, this.plugin, ignoreCancelled));
+    }
+
+    /**
+     * 处理一个事件。
+     *
+     * @param eventClass    {@link Event} 事件类
+     * @param eventConsumer 处理方法
+     * @param <T>           {@link Event} 事件的类型
+     * @return 本实例
+     */
     public <T extends Event> EasyListener handle(@NotNull Class<T> eventClass,
                                                  @NotNull Consumer<T> eventConsumer) {
         return handle(eventClass, null, eventConsumer);
     }
 
+    /**
+     * 处理一个事件。
+     *
+     * @param eventClass      {@link Event} 事件类
+     * @param ignoreCancelled 是否忽略掉已经被取消的事件
+     * @param eventConsumer   处理方法
+     * @param <T>             {@link Event} 事件的类型
+     * @return 本实例
+     */
     public <T extends Event> EasyListener handle(@NotNull Class<T> eventClass, boolean ignoreCancelled,
                                                  @NotNull Consumer<T> eventConsumer) {
         return handle(eventClass, null, ignoreCancelled, eventConsumer);
     }
 
+    /**
+     * 处理一个事件。
+     *
+     * @param eventClass    {@link Event} 事件类
+     * @param priority      {@link EventPriority} 事件处理优先级
+     * @param eventConsumer 处理方法
+     * @param <T>           {@link Event} 事件的类型
+     * @return 本实例
+     */
     public <T extends Event> EasyListener handle(@NotNull Class<T> eventClass, @Nullable EventPriority priority,
                                                  @NotNull Consumer<T> eventConsumer) {
         return handle(eventClass, priority, false, eventConsumer);
     }
 
-
+    /**
+     * 处理一个事件。
+     *
+     * @param eventClass      {@link Event} 事件类
+     * @param priority        {@link EventPriority} 事件处理优先级
+     * @param ignoreCancelled 是否忽略掉已经被取消的事件
+     * @param eventConsumer   处理方法
+     * @param <T>             {@link Event} 事件的类型
+     * @return 本实例
+     */
     public <T extends Event> EasyListener handle(@NotNull Class<T> eventClass,
                                                  @Nullable EventPriority priority, boolean ignoreCancelled,
                                                  @NotNull Consumer<T> eventConsumer) {
         final EventPriority eventPriority = Optional.ofNullable(priority).orElse(EventPriority.NORMAL);
-
-        RegisteredListener registeredListener = new RegisteredListener(
-                this, createExecutor(eventClass, eventConsumer),
-                eventPriority, this.plugin, ignoreCancelled
-        );
-        register(eventClass, registeredListener);
+        final EventExecutor executor = createExecutor(eventClass, eventConsumer);
+        register(eventClass, executor, eventPriority, ignoreCancelled);
         return this;
     }
 
+    /**
+     * 无判别地取消一个事件。
+     *
+     * @param eventClass {@link Event} 事件类
+     * @param <T>        {@link Event} 事件的类型，必须实现 {@link Cancellable} 。
+     * @return 本实例
+     * @throws IllegalArgumentException 如果事件没有实现 {@link Cancellable} 则抛出此异常
+     */
     public <T extends Event> EasyListener cancel(@NotNull Class<T> eventClass) {
         return cancel(eventClass, null, null);
     }
 
+    /**
+     * 有条件地取消一个事件。
+     *
+     * @param eventClass     {@link Event} 事件类
+     * @param eventPredicate 判断事件是否可以取消的条件
+     * @param <T>            {@link Event} 事件的类型，必须实现 {@link Cancellable} 。
+     * @return 本实例
+     * @throws IllegalArgumentException 如果事件没有实现 {@link Cancellable} 则抛出此异常
+     */
     public <T extends Event> EasyListener cancel(@NotNull Class<T> eventClass, @Nullable Predicate<T> eventPredicate) {
         return cancel(eventClass, null, eventPredicate);
     }
 
-    public <T extends Event> EasyListener cancel(@NotNull Class<T> eventClass, @Nullable EventPriority priority, @Nullable Predicate<T> eventPredicate) {
+    /**
+     * 有条件地取消一个事件。
+     *
+     * @param eventClass     {@link Event} 事件类
+     * @param priority       {@link EventPriority} 事件处理优先级
+     * @param eventPredicate 判断事件是否可以取消的条件
+     * @param <T>            {@link Event} 事件的类型，必须实现 {@link Cancellable} 。
+     * @return 本实例
+     * @throws IllegalArgumentException 如果事件没有实现 {@link Cancellable} 则抛出此异常
+     */
+    public <T extends Event> EasyListener cancel(@NotNull Class<T> eventClass, @Nullable EventPriority priority,
+                                                 @Nullable Predicate<T> eventPredicate) {
         if (!Cancellable.class.isAssignableFrom(eventClass)) {
             throw new IllegalArgumentException("Event class " + eventClass.getName() + " is not cancellable");
         }
