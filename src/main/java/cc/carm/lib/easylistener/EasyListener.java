@@ -287,6 +287,7 @@ public class EasyListener implements Listener {
         });
     }
 
+    @SuppressWarnings("deprecation")
     public EasyListener cancelDeath(@Nullable Predicate<Player> predicate,
                                     @Nullable Consumer<PlayerDeathEvent> handler) {
         final Predicate<Player> p = Optional.ofNullable(predicate).orElse((player) -> true);
