@@ -1,4 +1,4 @@
-import cc.carm.lib.easylisteners.EasyListener;
+import cc.carm.lib.easylistener.EasyListener;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;

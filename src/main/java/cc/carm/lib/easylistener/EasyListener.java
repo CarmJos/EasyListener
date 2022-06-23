@@ -1,4 +1,4 @@
-package cc.carm.lib.easylisteners;
+package cc.carm.lib.easylistener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,6 +38,14 @@ public class EasyListener implements Listener {
 
     public EasyListener(Plugin plugin) {
         this.plugin = plugin;
+    }
+
+    /**
+     * 注销本监听器内的全部监听器。
+     * <br> 也可以通过 {@link HandlerList#unregister(Listener)} 方法注销本监听器。
+     */
+    public void unregisterAll() {
+        HandlerList.unregisterAll(this);
     }
 
     /**
@@ -241,9 +249,9 @@ public class EasyListener implements Listener {
     }
 
     public EasyListener cancelPlace(@Nullable Predicate<BlockPlaceEvent> blockBreakPredicate,
-                                    @Nullable Predicate<PlayerBucketEmptyEvent> bucketFillPredicate) {
+                                    @Nullable Predicate<PlayerBucketEmptyEvent> bucketEmptyPredicate) {
         return cancel(BlockPlaceEvent.class, blockBreakPredicate)
-                .cancel(PlayerBucketEmptyEvent.class, bucketFillPredicate);
+                .cancel(PlayerBucketEmptyEvent.class, bucketEmptyPredicate);
     }
 
     /**
