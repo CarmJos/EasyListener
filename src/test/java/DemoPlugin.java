@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class DemoPlugin extends JavaPlugin {
 
-    protected final EasyListener listeners = new EasyListener(this);
+    protected final EasyListener listeners = EasyListener.create(this);
 
     @Override
     public void onEnable() {

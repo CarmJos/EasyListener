@@ -18,7 +18,7 @@
 
 public class DemoPlugin extends JavaPlugin {
 
-    protected final EasyListener listeners = new EasyListener(this);
+    protected final EasyListener listeners = EasyListener.create(this);
 
     @Override
     public void onEnable() {
@@ -37,7 +37,7 @@ public class DemoPlugin extends JavaPlugin {
                         EntityDamageEvent.class, EventPriority.HIGHEST,
                         (event) -> event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK
                 ); // 有条件的取消一个事件
-        
+
         listeners  // 额外提供的快捷方法
                 .cancelDeath(null) // 所有玩家取消死亡
                 .cancelBreak(player -> !player.isOp()) // 禁止非OP玩家破坏方块/接水或岩浆
