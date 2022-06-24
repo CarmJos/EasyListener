@@ -136,7 +136,9 @@ public class EasyListener implements Listener {
                                                  @Nullable EventPriority priority,
                                                  @Nullable Predicate<? super T> eventPredicate,
                                                  @Nullable Consumer<? super T> afterCancelled) {
-        requireType(Cancellable.class, eventClass, "Event class " + eventClass.getName() + " is not cancellable");
+        if (!Cancellable.class.isAssignableFrom(eventClass)) {
+            throw new IllegalArgumentException("Event class " + eventClass.getName() + " is not cancellable");
+        }
 
         final Predicate<? super T> predicate = Optional.ofNullable(eventPredicate).orElse(t -> true);
         return handle(eventClass, priority, true, (event) -> {
@@ -272,13 +274,6 @@ public class EasyListener implements Listener {
                 throw new EventException(t);
             }
         };
-    }
-
-    protected void requireType(@NotNull Class<?> target, @NotNull Class<?> value,
-                               @Nullable String message) throws IllegalArgumentException {
-        if (target.isAssignableFrom(value)) return;
-        if (message == null) throw new IllegalArgumentException();
-        else throw new IllegalArgumentException(message);
     }
 
     protected void register(@NotNull Class<? extends Event> eventClass, @NotNull RegisteredListener listener) {
