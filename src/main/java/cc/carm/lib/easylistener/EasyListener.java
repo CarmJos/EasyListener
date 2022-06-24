@@ -4,7 +4,11 @@ import cc.carm.lib.easylistener.handler.BundleEventHandler;
 import cc.carm.lib.easylistener.handler.MultiEventHandler;
 import cc.carm.lib.easylistener.handler.SingleEventHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.block.BlockEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -45,18 +50,53 @@ public class EasyListener implements Listener {
         HandlerList.unregisterAll(this);
     }
 
+    /**
+     * 利用 functional 接口对单个 {@link Event} 进行监听处理。
+     *
+     * @param eventClass {@link Event} 事件类
+     * @param <E>        {@link Event} 事件的类型
+     * @return {@link SingleEventHandler} 构造器实例
+     */
     public <E extends Event> @NotNull SingleEventHandler<E> handleEvent(@NotNull Class<E> eventClass) {
         return new SingleEventHandler<>(this, eventClass);
     }
 
+    /**
+     * 利用 functional 接口对多个同类 {@link Event} 进行监听处理。
+     *
+     * <br> 创建后，通过{@link MultiEventHandler#from(Class)} 申明具体监听的事件类型。
+     *
+     * @param eventType {@link Event} 的主要类型，如 {@link PlayerEvent}、{@link BlockEvent} 等。
+     * @param <E>       {@link Event} 的类型
+     * @return {@link MultiEventHandler} 构造器实例
+     */
     public <E extends Event> @NotNull MultiEventHandler<E> handleEvents(@NotNull Class<E> eventType) {
         return new MultiEventHandler<>(this, eventType);
     }
 
+    /**
+     * 利用 functional 接口对多个同属 {@link Event} 进行监听处理。
+     * <br> 创建后，通过{@link BundleEventHandler#from(Class, Function)}  申明具体监听的事件类型与转换函数。
+     * <br> 通过转换函数，即可以将 {@link Event} 转换为给定类型实例，以方便统一处理。
+     *
+     * @param elementClass 要处理的目标类型类，如 {@link Player}、{@link Block} 等。
+     * @param <T>          要处理的目标类型
+     * @return {@link BundleEventHandler} 构造器实例
+     */
     public <T> @NotNull BundleEventHandler<T, Event> handleBundle(@NotNull Class<T> elementClass) {
         return handleBundle(elementClass, Event.class);
     }
 
+    /**
+     * 利用 functional 接口对多个同属 {@link Event} 进行监听处理。
+     * <br> 创建后，通过{@link BundleEventHandler#from(Class, Function)}  申明具体监听的事件类型与转换函数。
+     * <br> 通过转换函数，即可以将 {@link Event} 转换为给定类型实例，以方便统一处理。
+     *
+     * @param elementClass 要处理的目标类型类，如 {@link Player}、{@link Block} 等。
+     * @param eventType    {@link Event} 的主要类型，如 {@link PlayerEvent}、{@link BlockEvent} 等。
+     * @param <T>          要处理的目标类型
+     * @return {@link BundleEventHandler} 构造器实例
+     */
     public <T, E extends Event> @NotNull BundleEventHandler<T, E> handleBundle(@NotNull Class<T> elementClass,
                                                                                @NotNull Class<E> eventType) {
         return new BundleEventHandler<>(this, elementClass, eventType);
