@@ -8,8 +8,6 @@
 
 轻松(做)监听，简单快捷的通用Bukkit插件监听器类库。
 
-> 本项目由 舰长 @tdiant 委托本人开发。
-
 ### [开发示例](src/test/java/DemoPlugin.java)
 
 相关开发示例请 [点击这里](src/test/java/DemoPlugin.java)，您也可以直接访问项目的 [JavaDoc](https://carmjos.github.io/EasyListener) 。
